@@ -1,0 +1,42 @@
+# ESP32 sensor sketch for Arduino IDE
+
+This sketch reads the rain and sound sensor analog outputs and sends percentage
+readings to the Raspberry Pi Flask app.
+
+## Configure
+
+1. Copy `credentials.example.h` to `credentials.h` in this folder.
+2. Edit `credentials.h` with your Wi-Fi name/password and the Pi's current IP.
+   The private file is excluded by `.gitignore`.
+3. Keep the Pi Flask app running and connect the Pi and ESP32 to the same Wi-Fi.
+
+## Use in Arduino IDE
+
+1. Install Arduino IDE and add Espressif's ESP32 board support in Boards Manager.
+2. Open `esp32-arduino.ino` from this folder.
+3. Select the matching ESP32 board (for a common DevKit, **ESP32 Dev Module**)
+   and the board's USB port.
+4. Click **Verify**, then **Upload**.
+5. Open **Serial Monitor** at 115200 baud. A successful request prints response
+   code `200`.
+
+The USB connection must be to the computer running Arduino IDE. The Raspberry
+Pi runs `app.py` separately. Set `SERVER_URL` in `credentials.h` to the Pi's
+current IP address.
+
+## Wiring and calibration
+
+- Rain sensor AO -> ESP32 GPIO 34
+- Sound sensor AO -> ESP32 GPIO 35
+- Active buzzer signal -> ESP32 GPIO 23
+- Sensor grounds -> ESP32 GND
+
+Never allow an ESP32 analog input to exceed 3.3 V. Adjust the calibration
+constants in the sketch using observed raw ADC readings. Sound percentage is a
+rough signal-range indicator, not a calibrated decibel measurement.
+
+The buzzer gives short repeating beeps when wetness reaches 50% or sound reaches
+70%. Each beep is on for 100 ms with a 300 ms pause. Use a transistor driver for
+a buzzer that draws more current than an ESP32 GPIO can safely provide, and
+connect the grounds together. This local buzzer is not controlled by the
+dashboard's mute button.
